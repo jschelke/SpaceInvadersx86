@@ -3,8 +3,8 @@
 # =============================================================================
 
 # Settings - Edit the names of the object and executable files.
-objects1 = SpaceInvaders.obj
-dest = SpaceInvaders.exe
+objects1 = GAME.obj
+dest = GAME.exe
 
 # =============================================================================
 # Do NOT edit this section, unless you know what you are doing.
