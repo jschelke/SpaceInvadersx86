@@ -17,6 +17,8 @@ CODESEG
 ; Set the video mode
 PROC setVideoMode
 	ARG @@Mode:byte
+	USES eax
+
 	mov ah, 0
 	mov al, [@@Mode]
 	int 10h
@@ -27,11 +29,11 @@ ENDP setVideoMode
 ; Fill the background (for mode 13h)
 PROC fillBackground
     ARG @@fillColor:byte
-	USES eax,ebx, edi
+	USES eax, ecx, edi
 
-	mov edi,VMEMADR
+	mov edi, VMEMADR
 	mov ecx, SCRWIDTH*SCRHEIGHT
-	mov al,[@@fillColor]
+	mov al, [@@fillColor]
 	rep stosb
 	
 	ret
@@ -39,19 +41,25 @@ ENDP fillBackground
 
 ; Draw the main ship
 PROC drawShip
-	ARG @@fillColor:byte
+	ARG @@fillColor:byte, @@xpos:dword, @@ypos:dword
+	USES eax, edx, ecx, edi
 	
-	mov al,[@@fillColor]
-	@@colcount:
-	inc cx
-	int 10h
-	cmp cx, 30
-	JNE @@colcount
+	mov ecx, CHARACTERHEIGHT
+	@@heighloop:
+		mov eax, [@@ypos]	;/** Calculate the start position of the current line to draw
+		add eax, ecx		; *
+		mov edx, SCRWIDTH	; *
+		mul edx				; *
+		add eax, [@@xpos]	; *
+		add eax, VMEMADR	; *
+		mov edi, eax		; */
+		push ecx			; Safe outer loop
+		mov ecx, CHARACTERWIDTH
+		mov al, [@@fillColor]
+		rep stosb
+		pop ecx				; Restore outer loop
+	loop @@heighloop
 
-	mov cx, 10  ; reset to start of col
-	inc dx      ;next row
-	cmp dx, 30
-	JNE @@colcount
 	ret
 ENDP drawShip
 

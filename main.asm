@@ -28,10 +28,12 @@ CODESEG
 PROC startUp
 	call setVideoMode, 13h
 	call fillBackground, 1
+
+	ret
 ENDP startUp
 
-; Wait for a specific keystroke.
-PROC waitForSpecificKeystroke
+; Wait for esc keystroke.
+PROC isESCpressed
 	@@tryagain:
 		mov	ah, 00h
 		int	16h
@@ -40,14 +42,16 @@ PROC waitForSpecificKeystroke
 	call terminateProcess
 
 	ret
-ENDP waitForSpecificKeystroke
+ENDP isESCpressed
 
 ; Terminate the program.
 PROC terminateProcess
 	USES eax
+
 	call setVideoMode, 03h
-	mov	ax,04C00h
+	mov	ax, 04C00h
 	int 21h
+
 	ret
 ENDP terminateProcess
 
@@ -60,19 +64,9 @@ PROC main
 
 	call startUp
 
-	call drawShip
+	call drawShip, 10, 100, 100 ; color, xpos, ypos
 
-	; call waitForSpecificKeystroke
-	@@no_key_pressed:
-	; mov ah, 01h;    function 01h(test key pressed )
-	; int 16h;call keyboard BIOS
-	; jz @@no_key_pressed;jump to some label if no key was pressed
-	mov ah, 00h		;function 00h (get key from buffer)
-	int 16h			;call keyboard BIOS
-	cmp al, 27
-	jne @@no_key_pressed
-	
-	call terminateProcess
+	call isESCpressed
 ENDP main
 
 ;=============================================================================
