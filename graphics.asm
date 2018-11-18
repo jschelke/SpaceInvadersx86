@@ -63,6 +63,61 @@ PROC drawShip
 	ret
 ENDP drawShip
 
+PROC drawTurret
+	ARG @@xpos:dword, @@ypos:dword
+	USES eax, edx, ecx, edi
+	
+
+		ARG @@arrlen:dword
+	USES eax, ebx, ecx, edx
+	
+	mov eax, [@@arrlen]
+	mov ecx, [eax]
+	xor edx, edx
+	
+	startLoop:
+		call printUnsignedInteger, [turret + 4*edx]
+		inc edx
+	loop startLoop
+
+	ret
+ENDP drawTurret
+
+PROC drawTurret
+	ARG @@xpos:dword, @@ypos:dword
+	USES eax, edx, ecx, edi
+	
+
+		ARG @@arrlen:dword
+	USES eax, ebx, ecx, edx
+	
+	mov ebx, 12 ; width of turret
+	
+	xor edx, edx
+	xor eax, eax
+	xor ecx, ecx
+
+	mov edx, [offset turretArrayLength] ; length array
+	startrow: 
+		mov ecx, ebx ; collumn count
+		startcollumn:
+			mov edi, 0A0000H
+			add edi, 320*
+			mov al , [turret + 4*edx]
+
+			
+			dec ecx
+			dec edx
+
+			cmp ecx, 0
+			jg startcollumn
+			cmp edx , 0
+			jg startrow
+		loop startLoop
+
+	ret
+ENDP drawTurret
+
 ;=============================================================================
 ; Uninitialized DATA
 ;=============================================================================
@@ -72,5 +127,8 @@ UDATASEG
 ; DATA
 ;=============================================================================
 DATASEG
+	turretArrayLength dd 48
+	turret d 15, 15, 15, 14, 14, 15, 15, 15, 15, 14, 14, 14, 14, 15, 15, 14, 14, 14, 14, 14, 14, 15, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14
+
 
 END 

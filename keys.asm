@@ -53,28 +53,28 @@ PROC isKeypressed
 		cmp ah, 75
 		jne @@notPressedLeft 
 			; call leftPressed
-			call printString, offset left
+			; call printString, offset left
 			jmp @@endCases
 		@@notPressedLeft:
 
 		cmp ah, 77
 		jne @@notPressedRight 
 			; call rightPressed
-			call printString, offset right
+			; call printString, offset right
 			jmp @@endCases
 		@@notPressedRight:
 
 		cmp ah, 72
 		jne @@notPressedUP
 			; call rightPressed
-			call printString, offset up
+			; call printString, offset up
 			jmp @@endCases
 		@@notPressedUP:
 
 		cmp ah, 80
 		jne @@notPressedDown
 			; call rightPressed
-			call printString, offset down
+			; call printString, offset down
 			jmp @@endCases
 		@@notPressedDown:
 

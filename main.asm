@@ -53,9 +53,9 @@ PROC main
 	push ds
 	pop	es
 
-	; call startUp
+	call startUp
 
-	; call drawShip, 10, 100, 100 ; color, xpos, ypos
+	call drawShip, 10, 100, 100 ; color, xpos, ypos
 
 
 
