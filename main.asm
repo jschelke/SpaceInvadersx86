@@ -32,6 +32,7 @@ PROC startUp
 	ret
 ENDP startUp
 
+
 ; Wait for esc keystroke.
 PROC isESCpressed
 	@@tryagain:
@@ -43,6 +44,7 @@ PROC isESCpressed
 
 	ret
 ENDP isESCpressed
+
 
 ; Terminate the program.
 PROC terminateProcess
