@@ -17,7 +17,10 @@ ASSUME cs:_TEXT,ds:FLAT,es:FLAT,fs:FLAT,gs:FLAT
 ; INCLUDES
 ;=============================================================================
 include "globals.inc"
+include "main.inc"
 include "graphics.inc"
+include "keys.inc"
+include "debug.inc"
 
 ;=============================================================================
 ; CODE
@@ -31,28 +34,6 @@ PROC startUp
 
 	ret
 ENDP startUp
-
-PROC leftPressed
-	
-ENDP leftPressed
-
-PROC RightPressed
-	
-ENDP RightPressed
-
-
-; Wait for esc keystroke.
-PROC isESCpressed
-	@@tryagain:
-		mov	ah, 00h
-		int	16h
-		cmp al, 27
-	jne @@tryagain
-	call terminateProcess
-
-	ret
-ENDP isESCpressed
-
 
 ; Terminate the program.
 PROC terminateProcess
@@ -72,11 +53,16 @@ PROC main
 	push ds
 	pop	es
 
-	call startUp
+	; call startUp
 
-	call drawShip, 10, 100, 100 ; color, xpos, ypos
+	; call drawShip, 10, 100, 100 ; color, xpos, ypos
 
-	call isESCpressed
+
+
+	looper:
+	call isKeypressed
+	; call printUnsignedInteger, [playerPossition]
+	jmp looper
 ENDP main
 
 ;=============================================================================
@@ -88,7 +74,7 @@ UDATASEG
 ; DATA
 ;=============================================================================
 DATASEG
-
+	playerPossition dd 100, 100 ;x, y
 ;=============================================================================
 ; STACK
 ;=============================================================================
