@@ -32,6 +32,14 @@ PROC startUp
 	ret
 ENDP startUp
 
+PROC leftPressed
+	
+ENDP leftPressed
+
+PROC RightPressed
+	
+ENDP RightPressed
+
 
 ; Wait for esc keystroke.
 PROC isESCpressed

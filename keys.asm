@@ -38,11 +38,11 @@ PROC isKeypressed
 	call leftPressed
 	@@notPressedLeft:
     cmp al, 27 ; check if Left is pressed
-	jne @@notPressedLeft ; if not pressed skip terminate function
-	call leftPressed
-	@@notPressedLeft:
+	jne @@notPressedRight ; if not pressed skip terminate function
+	call rightPressed
+	@@notPressedRight:
 	ret
-ENDP isESCpressed
+ENDP isKeypressed
 
 ; Wait for Left arrow keystroke.
 PROC isLeftpressed
