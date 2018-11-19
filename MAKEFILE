@@ -3,7 +3,7 @@
 # =============================================================================
 
 # Settings - Edit the names of the object and executable files.
-objects = main.obj graphics.obj keys.obj debug.obj
+objects = main.obj graphics.obj keys.obj debug.obj player.obj
 dest = GAME.exe
 
 # =============================================================================
@@ -14,7 +14,8 @@ dest = GAME.exe
   tasm /ml /m2 /w2 /z /zi /iinclude $<
 
 $(dest): $(objects)
-  wlink option quiet system pmodew name $@ file {$(objects)}
+  # wlink option quiet system pmodew name $@ file {$(objects)}
+  wlink option quiet system pmodew name $@ file *.obj
   del *.obj
 
 clean: .symbolic
@@ -23,5 +24,6 @@ clean: .symbolic
 
 .silent
 debug: $(objects) .symbolic
-  wlink debug watcom all option quiet system pmodew name $(dest) file {$(objects)}
+  # wlink debug watcom all option quiet system pmodew name $(dest) file {$(objects)}
+  wlink debug watcom all option quiet system pmodew name $(dest) file *.obj
   wd /tr=rsi /li=43 $(dest)

@@ -8,6 +8,7 @@ ASSUME cs:_TEXT,ds:FLAT,es:FLAT,fs:FLAT,gs:FLAT
 ;=============================================================================
 include "globals.inc"
 include "graphics.inc"
+include "player.inc"
 
 ;=============================================================================
 ; CODE
@@ -44,7 +45,7 @@ PROC drawShip
 	ARG @@fillColor:byte, @@xpos:dword, @@ypos:dword
 	USES eax, edx, ecx, edi
 	
-	mov ecx, CHARACTERHEIGHT
+	mov ecx, [characterHeight]
 	@@heighloop:
 		mov eax, [@@ypos]	;/** Calculate the start position of the current line to draw
 		add eax, ecx		; *
@@ -53,8 +54,8 @@ PROC drawShip
 		add eax, [@@xpos]	; *
 		add eax, VMEMADR	; *
 		mov edi, eax		; */
-		push ecx			; Safe outer loop
-		mov ecx, CHARACTERWIDTH
+		push ecx			; Save outer loop
+		mov ecx, [characterWidth]
 		mov al, [@@fillColor]
 		rep stosb
 		pop ecx				; Restore outer loop

@@ -14,13 +14,24 @@ include "debug.inc"
 ;=============================================================================
 CODESEG
 
-PROC printUnsignedInteger
+PROC printInteger
 	ARG @@num:dword
 	USES eax, ebx, ecx, edx
 
 	mov eax, [@@num]	; eax holds input integer
 	mov ebx, 10		; divider
 	xor ecx, ecx	; counter for digit to be printed
+
+	cmp eax, 0
+	jge @@positiveNumber ; print a '-' if negative, skip otherwise
+		mov edx, -1
+		mul edx
+		push eax
+		mov ah, 2h
+		mov dl, '-'
+		int 21h
+		pop eax
+	@@positiveNumber:
 
 	;store digit on stack
 	@@getNextDigit:
@@ -46,7 +57,7 @@ PROC printUnsignedInteger
 		int 21h
 
 	ret
-ENDP printUnsignedInteger
+ENDP printInteger
 
 PROC printIntList
 	ARG @@arrpointer:dword, @@arrlen:dword
@@ -58,7 +69,7 @@ PROC printIntList
     mov eax, [@@arrpointer]
 
 	@@arrloop: 
-		call printUnsignedInteger, [dword ptr eax + 4*edx]
+		call printInteger, [dword ptr eax + 4*edx]
 		inc edx
 	loop @@arrloop
 

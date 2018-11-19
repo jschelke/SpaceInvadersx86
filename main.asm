@@ -21,6 +21,7 @@ include "main.inc"
 include "graphics.inc"
 include "keys.inc"
 include "debug.inc"
+include "player.inc"
 
 ;=============================================================================
 ; CODE
@@ -30,7 +31,12 @@ CODESEG
 ; Start up
 PROC startUp
 	call setVideoMode, 13h
-	call fillBackground, 1
+	call fillBackground, 0 ; Reset the canvas
+	call drawShip, 10, [playerPossition], [playerPossition + 4] ; color, x, y
+
+	call getTime
+	add eax, [timePerTick]
+	mov [nextTickTime], eax
 
 	ret
 ENDP startUp
@@ -39,12 +45,36 @@ ENDP startUp
 PROC terminateProcess
 	USES eax
 
+	call __keyb_uninstallKeyboardHandler
 	call setVideoMode, 03h
 	mov	ax, 04C00h
 	int 21h
 
 	ret
 ENDP terminateProcess
+
+; Get system time in 1/100th's of a second
+PROC getTime
+	ARG RETURNS eax
+	USES ebx, ecx, edx
+
+	mov ah, 2ch
+	int 21h
+	movzx ebx, dl
+	mov eax, 100
+	mul dh
+	add ebx, eax
+	mov eax, 6000
+	movzx edx, cl
+	mul edx
+	add ebx, eax
+	mov eax, 360000
+	movzx edx, ch
+	mul edx
+	add eax, ebx
+
+	ret
+ENDP
 
 PROC main
 	sti
@@ -53,28 +83,33 @@ PROC main
 	push ds
 	pop	es
 
-	; call startUp
+	call __keyb_installKeyboardHandler
 
-	; call drawShip, 10, 100, 100 ; color, xpos, ypos
+	call startUp
 
-
-
-	looper:
-	call isKeypressed
-	; call printUnsignedInteger, [playerPossition]
-	jmp looper
+	@@mainloop:
+		call getTime
+		cmp [nextTickTime], eax
+		jg @@skip
+			add eax, [timePerTick]
+			mov [nextTickTime], eax
+			call updatePlayerPosition
+		@@skip:
+		
+		call isKeypressed
+	jmp @@mainloop
 ENDP main
 
 ;=============================================================================
 ; Uninitialized DATA
 ;=============================================================================
 UDATASEG
-
+	nextTickTime dd ? ; 1/100th seconds
 ;=============================================================================
 ; DATA
 ;=============================================================================
 DATASEG
-	playerPossition dd 100, 100 ;x, y
+	timePerTick dd 5 ; 1/100th seconds
 ;=============================================================================
 ; STACK
 ;=============================================================================

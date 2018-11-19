@@ -1,3 +1,3 @@
 GLOBAL	printIntList:PROC, \
-		printUnsignedInteger:PROC,\
+		printInteger:PROC,\
 		printString:PROC
