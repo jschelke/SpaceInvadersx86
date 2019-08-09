@@ -21,7 +21,9 @@ include "main.inc"
 include "graphics.inc"
 include "keys.inc"
 include "debug.inc"
+include "missile.inc"
 include "player.inc"
+
 
 ;=============================================================================
 ; CODE
@@ -32,7 +34,7 @@ CODESEG
 PROC startUp
 	call setVideoMode, 13h
 	call fillBackground, 0 ; Reset the canvas
-	call drawShip, 10, [playerPossition], [playerPossition + 4] ; color, x, y
+	call drawShip, 10, [playerPosition], [playerPosition + 4] ; color, x, y
 
 	call getTime
 	add eax, [timePerTick]
@@ -94,6 +96,7 @@ PROC main
 			add eax, [timePerTick]
 			mov [nextTickTime], eax
 			call updatePlayerPosition
+			call updateMissilePosition
 		@@skip:
 		
 		call isKeypressed

@@ -1,7 +1,8 @@
 GLOBAL  updatePlayerPosition:PROC
 
-GLOBAL playerPossition:DWORD
+GLOBAL playerPosition:DWORD
 GLOBAL playerSpeed:DWORD
 GLOBAL characterWidth:DWORD
 GLOBAL characterHeight:DWORD
 GLOBAL playerMaxSpeed:DWORD
+GLOBAL playerMovementHeight:DWORD

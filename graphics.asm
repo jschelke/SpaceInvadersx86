@@ -9,6 +9,7 @@ ASSUME cs:_TEXT,ds:FLAT,es:FLAT,fs:FLAT,gs:FLAT
 include "globals.inc"
 include "graphics.inc"
 include "player.inc"
+include "missile.inc"
 
 ;=============================================================================
 ; CODE
@@ -63,6 +64,29 @@ PROC drawShip
 
 	ret
 ENDP drawShip
+
+PROC drawMissile
+	ARG @@fillColor_m:byte, @@xpos_m:dword, @@ypos_m:dword
+	USES eax, edx, ecx, edi
+	
+	mov ecx, [missileHeight]
+	@@heightloop:
+		mov eax, [@@ypos_m]	;/** Calculate the start position of the current line to draw
+		add eax, ecx		; *
+		mov edx, SCRWIDTH	; *
+		mul edx				; *
+		add eax, [@@xpos_m]	; *
+		add eax, VMEMADR	; *
+		mov edi, eax		; */
+		push ecx			; Save outer loop
+		mov ecx, [missileWidth]
+		mov al, [@@fillColor_m]
+		rep stosb
+		pop ecx				; Restore outer loop
+	loop @@heightloop
+
+	ret
+ENDP drawMissile
 
 ; PROC drawTurret
 ; 	ARG @@xpos:dword, @@ypos:dword

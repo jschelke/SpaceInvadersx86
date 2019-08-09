@@ -11,7 +11,9 @@ include "graphics.inc"
 include "main.inc"
 include "keys.inc"
 include "player.inc"
+include "missile.inc"
 include "debug.inc"
+
 
 ;=============================================================================
 ; CODE
@@ -56,6 +58,19 @@ PROC isKeypressed
 		mov [playerSpeed + 4], eax
 		; call printString, offset down
 	@@notPressedDown:
+
+	cmp [__keyb_keyboardState + 39h], 1 ; space
+	jne @@notPressedSpace
+		cmp [isSpacePressed], 0 ; Check if space is pressed before to only execute function once
+		jne @@PressedBefore
+			;call printString, offset space ; call funtion to add missile
+			call addMissile
+			mov [isSpacePressed], 1
+		@@PressedBefore:
+		jmp @@spacePressed ; jump to space pressed
+	@@notPressedSpace:
+		mov [isSpacePressed], 0
+	@@spacePressed:
 
 	ret
 ENDP isKeypressed
@@ -206,12 +221,13 @@ DATASEG
 	__keyb_rawScanCode			db ?			; scan code of last pressed key
 	__keyb_keysActive			db ?			; number of actively pressed keys
 
-
+	isSpacePressed DB 0
 
 	sepp db "--------", 10, 13, '$'
 	up db "up", 10, 13, '$'
 	down db "down", 10, 13, '$'
 	left db "left", 10, 13, '$'
 	right db "right", 10, 13, '$'
+	space db "space", 10, 13, '$'
 
 END 

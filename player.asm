@@ -24,40 +24,40 @@ PROC updatePlayerPosition
 	or eax, [playerSpeed + 4]
 	test eax, eax
 	jz @@nomovement
-		call drawShip, 0, [playerPossition], [playerPossition + 4] ; make old position black
+		call drawShip, 0, [playerPosition], [playerPosition + 4] ; make old position black
 
 		; Move to the left
 		mov eax, [playerSpeed]
-		add [playerPossition], eax
+		add [playerPosition], eax
 		jns @@leftBorderSafe
-			mov [playerPossition], 0
+			mov [playerPosition], 0
 		@@leftBorderSafe:
 
 		; Move to the right
 		mov eax, SCRWIDTH
 		sub eax, [characterWidth]
-		cmp [playerPossition], eax
+		cmp [playerPosition], eax
 		jl @@rightBorderSafe
-			mov [playerPossition], eax
+			mov [playerPosition], eax
 		@@rightBorderSafe:
 
 		; Move up
 		mov eax, [playerSpeed + 4]
-		add [playerPossition + 4], eax
+		add [playerPosition + 4], eax
 		jns @@upperBorderSafe
-			mov [playerPossition + 4], 0
+			mov [playerPosition + 4], 0
 		@@upperBorderSafe:
 
 		; Move down
 		mov eax, SCRHEIGHT
 		sub eax, [characterHeight]
-		cmp [playerPossition + 4], eax
+		cmp [playerPosition + 4], eax
 		jl @@lowerBorderSafe
-			mov [playerPossition + 4], eax
+			mov [playerPosition + 4], eax
 		@@lowerBorderSafe:
 
 
-		call drawShip, 10, [playerPossition], [playerPossition + 4] ; color new position
+		call drawShip, 10, [playerPosition], [playerPosition + 4] ; color new position
 	@@nomovement:
 
 	ret
@@ -72,7 +72,7 @@ UDATASEG
 ; DATA
 ;=============================================================================
 DATASEG
-	playerPossition dd 100, 100 ;x, y
+	playerPosition dd 100, 100 ;x, y
 	playerSpeed dd 0, 0 ;vx, vy
 	playerMaxSpeed dd 4, -4
 	characterWidth dd 30
