@@ -10,6 +10,7 @@ include "globals.inc"
 include "graphics.inc"
 include "player.inc"
 include "missile.inc"
+include "enemy.inc"
 
 ;=============================================================================
 ; CODE
@@ -87,6 +88,32 @@ PROC drawMissile
 
 	ret
 ENDP drawMissile
+
+; Draw the enemy
+PROC drawEnemy
+	ARG @@fillColor:byte, @@xposE:dword, @@yposE:dword
+	USES eax, edx, ecx, edi
+	
+	mov ecx, [enemyHeight]
+	@@heightloopE:
+		mov eax, [@@yposE]	;/** Calculate the start position of the current line to draw
+		add eax, ecx		; *
+		mov edx, SCRWIDTH	; *
+		mul edx				; *
+		add eax, [@@xposE]	; *
+		add eax, VMEMADR	; *
+		mov edi, eax		; */
+		push ecx			; Save outer loop
+		mov ecx, [enemyWidth]
+		mov al, [@@fillColor]
+		rep stosb
+		pop ecx				; Restore outer loop
+	loop @@heightloopE
+
+	ret
+ENDP drawEnemy
+
+
 
 ; PROC drawTurret
 ; 	ARG @@xpos:dword, @@ypos:dword

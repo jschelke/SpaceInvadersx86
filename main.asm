@@ -23,6 +23,7 @@ include "keys.inc"
 include "debug.inc"
 include "missile.inc"
 include "player.inc"
+include "enemy.inc"
 
 
 ;=============================================================================
@@ -88,7 +89,7 @@ PROC main
 	call __keyb_installKeyboardHandler
 
 	call startUp
-
+	call addEnemies
 	@@mainloop:
 		call getTime
 		cmp [nextTickTime], eax

@@ -1,4 +1,5 @@
 GLOBAL	setVideoMode:PROC, \
 		fillBackground:PROC, \
 		drawShip:PROC, \
-		drawMissile:PROC
+		drawMissile:PROC, \
+		drawEnemy:PROC
