@@ -1,6 +1,6 @@
 GLOBAL  updateMissilePosition:PROC, \
         addMissile:PROC, \
-        checkHits:PROC
+        resetMissiles:PROC
 
 GLOBAL missileAmount:DWORD
 GLOBAL missilePosition:DWORD

@@ -52,12 +52,12 @@ PROC drawRectangle
 	mov ecx, [@@Height]
 	@@heighloop:
 		mov eax, [@@ypos]	;/** Calculate the start position of the current line to draw
-		sub eax, 1			; *
+		;sub eax, 1			; *
 		add eax, ecx		; *
 		mov edx, SCRWIDTH	; *
 		mul edx				; *
 		add eax, [@@xpos]	; *
-		sub eax, 1			; *
+		;sub eax, 1			; *
 		add eax, VMEMADR	; *
 		mov edi, eax		; */
 		push ecx			; Save outer loop
@@ -112,13 +112,14 @@ PROC drawSprite
 		;add eax, edx
 		cmp [byte ptr eax + edx], 1
 		jne @@noColour
-
-			mov edi, 0A0000H
+			mov edi, 0A0000h
 			mov eax, SCRWIDTH
 			push edx
 			add ebx, [@@ypos]
+			inc ebx
 			mul ebx
 			sub ebx, [@@ypos]
+			dec ebx
 			pop edx
 			add edi, eax
 
@@ -138,13 +139,14 @@ PROC drawSprite
 ENDP drawSprite
 
 PROC DisplayScore
+	ARG @@xpos:byte, @@ypos:byte
 	USES eax, ebx, ecx, edx
 
-    mov ah, 2     	; set cursor position
-	mov dh, 0     	; row in DH (00H is top)
-	mov dl, 0     	; column in DL (00H is left)
-	mov bh, 0		; page number in BH
-	int 10h       	; raise interrupt
+    mov ah, 2     		; set cursor position
+	mov dh, [@@ypos]	; row in DH (00H is top)
+	mov dl, [@@xpos]	; column in DL (00H is left)
+	mov bh, 0			; page number in BH
+	int 10h       		; raise interrupt
 
 	mov eax, [score]	; eax holds input integer
 	mov ebx, 10			; divider
@@ -168,6 +170,31 @@ PROC DisplayScore
 	ret
 ENDP DisplayScore
 
+PROC DisplayText
+	ARG @@xpos:byte, @@ypos:byte, @@text:dword
+
+	mov ah, 2     		; set cursor position
+	mov dh, [@@ypos]	; row in DH (00H is top)
+	mov dl, [@@xpos]	; column in DL (00H is left)
+	mov bh, 0			; page number in BH
+	int 10h       		; raise interrupt
+
+	mov ah, 9h
+	mov edx, @@text
+	int 21h
+
+	ret
+ENDP DisplayText
+
+
+PROC showGameOver
+	call fillBackground, 0
+	call DisplayText, 15, 11, offset gameOverText
+	call DisplayScore, 17, 12
+	call DisplayText, 7, 14, offset pressToTryText
+	ret
+ENDP
+
 
 
 ;=============================================================================
@@ -183,10 +210,10 @@ DATASEG
 	turretSprite db 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0,	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 	turrentSpriteWidth dd 8
 
-	testString db "test $"
-	
-
 	enemySpriteLength dd 88
 	enemySprite db 	0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0,
 	enemySpriteWidth dd 11
+
+	gameOverText db "Game Over!$"
+	pressToTryText db "Press space to try again!$"
 END 

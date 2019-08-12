@@ -35,8 +35,17 @@ CODESEG
 PROC startUp
 	call setVideoMode, 13h
 	call fillBackground, 0 ; Reset the canvas
+
+	call resetMissiles
 	call drawSprite, 10, [playerPosition], [playerPosition + 4], offset turretSprite, [turretArrayLength], [turrentSpriteWidth]  ; color new position
-	
+	call enemyInitialization
+	call addEnemies
+	call DisplayScore, 0, 0
+
+	mov cx, 0fh
+	mov dx, 4240h
+	mov ah, 86h
+	int 15h
 
 	call getTime
 	add eax, [timePerTick]
@@ -80,6 +89,26 @@ PROC getTime
 	ret
 ENDP
 
+PROC gameOver
+	call showGameOver
+	@@waitforkey:
+		cmp [__keyb_keyboardState + 01h], 1 ; ESC
+		jne @@notPressedESC ; skip if not pressed
+			call terminateProcess
+		@@notPressedESC:
+
+		cmp [__keyb_keyboardState + 39h], 1 ; space
+		jne @@notPressedSpace
+			jmp @@loopbreak
+		@@notPressedSpace:
+
+		jmp @@waitforkey
+	@@loopbreak:
+	mov [score], 0
+	call startUp
+	ret
+ENDP
+
 
 
 PROC main
@@ -90,10 +119,7 @@ PROC main
 	pop	es
 
 	call __keyb_installKeyboardHandler
-
 	call startUp
-	call enemyInitialization
-	call addEnemies
 	
 	@@mainloop:
 		call getTime
@@ -101,11 +127,11 @@ PROC main
 		jg @@skip
 			add eax, [timePerTick]
 			mov [nextTickTime], eax
+			
 			call updateEnemyPosition
 			call updatePlayerPosition
 			call updateMissilePosition
-			call checkHits
-			call DisplayScore
+			call DisplayScore, 0, 0
 		@@skip:
 		
 		call isKeypressed

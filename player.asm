@@ -58,11 +58,8 @@ PROC updatePlayerPosition
 		jl @@lowerBorderSafe
 			mov [playerPosition + 4], eax
 		@@lowerBorderSafe:
-
-
-		
 	@@nomovement:
-	;call drawShip, 10, [playerPosition], [playerPosition + 4] ; color new position
+
 	call drawSprite, 10, [playerPosition], [playerPosition + 4], offset turretSprite, [turretArrayLength], [turrentSpriteWidth]  ; color new position
 	
 	ret

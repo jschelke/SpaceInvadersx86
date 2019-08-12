@@ -23,9 +23,10 @@ CODESEG
 PROC updateMissilePosition
     USES eax, ebx, ecx, edx
 
-    mov ecx, [missileAmount]
     xor ebx, ebx
     @@missileLoop:
+        cmp ebx, [missileAmount]
+        je @@endMissileLoop
         mov eax, ebx ; calculate offset of array in eax
         mov edx, 8
         mul edx
@@ -43,11 +44,12 @@ PROC updateMissilePosition
                 mov [missilePosition+eax],1000
                 jmp @@noMissile
             @@noOutOfBounds:
+            call checkEnemyHit, [missilePosition+eax], [missilePosition+eax+4], ebx
             call drawMissile, 10, [missilePosition+eax], [missilePosition+eax+4]
         @@noMissile:
         inc ebx
-        loop @@missileLoop
-
+        jmp @@missileLoop
+    @@endMissileLoop:
 	ret
 ENDP
 
@@ -72,7 +74,6 @@ PROC addMissile
             sub edx, 1
             mov [missilePosition+eax+4], edx ; set y position of missile
 
-            ;call drawMissile, 10, [playerPosition], edx ; draw missile
             jmp @@endLoop
         @@noAvailableMissile:
         inc ebx
@@ -82,27 +83,26 @@ PROC addMissile
     ret
 ENDP
 
-PROC checkHits
-    USES eax, ebx, ecx, edx
+PROC resetMissiles
+    USES eax, ecx
+    
+    xor ecx, ecx
+    @@loopStart:
+        cmp ecx, [missileAmount]
+        je @@loopend
 
-    mov ecx, [missileAmount]
-    xor ebx, ebx
-    @@missileLoop:
-        mov eax, ebx ; calculate offset of array in eax
-        mov edx, 8
-        mul edx
+        mov eax, 8
+        mul ecx
 
-         ; registers free: ebx, edx
-        cmp [missilePosition+eax], 1000 ;check if missile is existing
-        je @@noMissile
-             ; loop over enemies
-            call checkEnemyHit, [missilePosition+eax], [missilePosition+eax+4], ebx
-        @@noMissile:
-        inc ebx
-        loop @@missileLoop
+        mov [missilePosition+eax], 1000
+        mov [missilePosition+eax+4], 1000
 
-	ret
-ENDP
+        inc ecx
+        jmp @@loopStart
+    @@loopend:
+
+    ret
+ENDP 
 
 ;=============================================================================
 ; Uninitialized DATA

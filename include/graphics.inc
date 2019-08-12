@@ -3,7 +3,8 @@ GLOBAL	setVideoMode:PROC, \
 		drawRectangle: PROC, \
 		drawSprite:PROC, \
 		drawMissile:PROC, \
-		DisplayScore:PROC
+		DisplayScore:PROC, \
+		showGameOver:PROC
 
 GLOBAL turretArrayLength:DWORD
 GLOBAL turretSprite:BYTE

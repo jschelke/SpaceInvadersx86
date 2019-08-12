@@ -81,30 +81,34 @@ PROC updateEnemyPosition
                 jmp @@endSwitchCase
             @@noRightMovement:
 
-            cmp ebx, 1 ; move right
+            cmp ebx, 1 ; move left
             jne @@noLeftMovement
                 mov edx, [enemySpeed]
                 sub [enemyPositionX+eax], edx
                 jmp @@endSwitchCase
             @@noLeftMovement:
 
-            cmp ebx, 2 ; move right
+            cmp ebx, 2 ; move down
             jne @@noDownMovement
                 mov edx, [enemySpacingY]
                 add [enemyPositionY+eax], edx
+
+                mov edx, [enemyPositionY+eax]
+                cmp edx, GAMEOVERLINE
+                jge @@gameOver
+
                 jmp @@endSwitchCase
             @@noDownMovement:
 
             @@endSwitchCase:
             
             call drawSprite, 10,[enemyPositionX+eax], [enemyPositionY+eax], offset enemySprite, [enemySpriteLength], [enemySpriteWidth] 
-            ;call drawEnemy, 10, [enemyPositionX+eax], [enemyPositionY+eax]
         @@noEnemy:
 
         inc ecx
         jmp @@loopBegin
     @@loopEnd:
-    cmp [enemiesAlive], 0
+    ; cmp [enemiesAlive], 0
     ; jne @@gameStillRunning
     ;     ;if running this all enemies are dead
     ;     call fillBackground, 0
@@ -112,6 +116,12 @@ PROC updateEnemyPosition
     ;     call enemyInitialization
 	;     call addEnemies
     ; @@gameStillRunning:
+
+    jmp @@skipGameOver
+    @@gameOver:
+        ;call gameOver
+    @@skipGameOver:
+
 	ret
 ENDP
 
@@ -201,7 +211,6 @@ PROC checkEnemyHit
                         mov [missilePosition+eax+4], 1000
 
                         inc [score]
-                        call DisplayScore
 
                         jmp @@loopEnd
         @@noHit:
@@ -225,6 +234,10 @@ PROC enemyInitialization
     mov ebx, SCRWIDTH
     sub ebx, eax
     mov [enemyMovementRangeX], ebx
+
+    mov [enemyMovedX], 0
+    mov [enemyMovementDirection], 0
+    mov [enemyDownMoveDone], 0
 
     ret
 ENDP
