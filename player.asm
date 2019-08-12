@@ -20,11 +20,13 @@ CODESEG
 PROC updatePlayerPosition
 	USES eax, ebx
 
+	call drawRectangle, 0, [playerPosition], [playerPosition + 4], [characterWidth], [characterHeight]
+
 	mov eax, [playerSpeed]
 	or eax, [playerSpeed + 4]
 	test eax, eax
 	jz @@nomovement
-		call drawRectangle, 0, [playerPosition], [playerPosition + 4], [characterWidth], [characterHeight]
+		
 		; call drawShip, 0, [playerPosition], [playerPosition + 4] ; make old position black
 
 		; Move to the left
@@ -58,9 +60,11 @@ PROC updatePlayerPosition
 		@@lowerBorderSafe:
 
 
-		call drawShip, 10, [playerPosition], [playerPosition + 4] ; color new position
+		
 	@@nomovement:
-
+	;call drawShip, 10, [playerPosition], [playerPosition + 4] ; color new position
+	call drawSprite, 10, [playerPosition], [playerPosition + 4], offset turretSprite, [turretArrayLength], [turrentSpriteWidth]  ; color new position
+	
 	ret
 ENDP
 

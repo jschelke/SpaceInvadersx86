@@ -1,7 +1,14 @@
 GLOBAL	setVideoMode:PROC, \
 		fillBackground:PROC, \
 		drawRectangle: PROC, \
-		drawShip:PROC, \
+		drawSprite:PROC, \
 		drawMissile:PROC, \
-		drawEnemy:PROC, \
 		DisplayScore:PROC
+
+GLOBAL turretArrayLength:DWORD
+GLOBAL turretSprite:BYTE
+GLOBAL turrentSpriteWidth:DWORD
+
+GLOBAL enemySpriteLength:DWORD
+GLOBAL enemySprite:BYTE
+GLOBAL enemySpriteWidth:DWORD

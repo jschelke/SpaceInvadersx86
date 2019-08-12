@@ -60,7 +60,7 @@ PROC updateEnemyPosition
     jmp @@stateFound
 
     @@stateFound:
-
+    mov [enemiesAlive], 0
     xor ecx, ecx ; current enemy position
     @@loopBegin:
         cmp ecx, [enemyAmount]
@@ -70,8 +70,8 @@ PROC updateEnemyPosition
         je @@noEnemy
             mov eax, 4
             mul ecx
-
-            call drawEnemy, 0, [enemyPositionX+eax], [enemyPositionY+eax]
+            inc [enemiesAlive]
+            call drawRectangle, 0, [enemyPositionX+eax], [enemyPositionY+eax], 13, 10
 
              ; start switch case for movement direction
             cmp ebx, 0 ; move right
@@ -96,13 +96,22 @@ PROC updateEnemyPosition
             @@noDownMovement:
 
             @@endSwitchCase:
-            call drawEnemy, 10, [enemyPositionX+eax], [enemyPositionY+eax]
+            
+            call drawSprite, 10,[enemyPositionX+eax], [enemyPositionY+eax], offset enemySprite, [enemySpriteLength], [enemySpriteWidth] 
+            ;call drawEnemy, 10, [enemyPositionX+eax], [enemyPositionY+eax]
         @@noEnemy:
 
         inc ecx
         jmp @@loopBegin
     @@loopEnd:
-
+    cmp [enemiesAlive], 0
+    ; jne @@gameStillRunning
+    ;     ;if running this all enemies are dead
+    ;     call fillBackground, 0
+    ;     call DisplayScore
+    ;     call enemyInitialization
+	;     call addEnemies
+    ; @@gameStillRunning:
 	ret
 ENDP
 
@@ -142,7 +151,7 @@ PROC addEnemies
         add eax, [enemyOffsetY]
         mov [enemyPositionY+edx], eax
         ; draw enemy
-        call drawEnemy, 10, [enemyPositionX+edx], [enemyPositionY+edx]
+        call drawSprite, 10,[enemyPositionX+edx], [enemyPositionY+edx], offset enemySprite, [enemySpriteLength], [enemySpriteWidth] 
         
         pop edx
         inc edx
@@ -180,7 +189,7 @@ PROC checkEnemyHit
                     jl @@noHit
                         ; hit is found in Y
                         ; remove enemy from game
-                        call drawEnemy, 0, [enemyPositionX+eax], [enemyPositionY+eax]
+                        call drawRectangle, 0, [enemyPositionX+eax], [enemyPositionY+eax], 13, 10
                         mov [enemyPositionX+eax], 1000
                         mov [enemyPositionY+eax], 1000
 
@@ -229,6 +238,7 @@ UDATASEG
 ; DATA
 ;=============================================================================
 DATASEG
+    enemiesAlive dd 0
     enemyAmount dd 44
 	enemyPositionX dd 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000 ;x, y
 	enemyPositionY dd 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000

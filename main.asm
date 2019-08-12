@@ -35,7 +35,8 @@ CODESEG
 PROC startUp
 	call setVideoMode, 13h
 	call fillBackground, 0 ; Reset the canvas
-	call drawShip, 10, [playerPosition], [playerPosition + 4] ; color, x, y
+	call drawSprite, 10, [playerPosition], [playerPosition + 4], offset turretSprite, [turretArrayLength], [turrentSpriteWidth]  ; color new position
+	
 
 	call getTime
 	add eax, [timePerTick]
@@ -78,6 +79,8 @@ PROC getTime
 
 	ret
 ENDP
+
+
 
 PROC main
 	sti

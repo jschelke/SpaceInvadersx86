@@ -93,48 +93,24 @@ PROC drawMissile
 	ret
 ENDP drawMissile
 
-; Draw the enemy
-PROC drawEnemy
-	ARG @@fillColor:byte, @@xposE:dword, @@yposE:dword
-	USES eax, edx, ecx, edi
-	
-	mov ecx, [enemyHeight]
-	@@heightloopE:
-		mov eax, [@@yposE]	;/** Calculate the start position of the current line to draw
-		add eax, ecx		; *
-		mov edx, SCRWIDTH	; *
-		mul edx				; *
-		add eax, [@@xposE]	; *
-		add eax, VMEMADR	; *
-		mov edi, eax		; */
-		push ecx			; Save outer loop
-		mov ecx, [enemyWidth]
-		mov al, [@@fillColor]
-		rep stosb
-		pop ecx				; Restore outer loop
-	loop @@heightloopE
-
-	ret
-ENDP drawEnemy
-
-
-
-PROC drawShip
-	ARG @@fillColor:byte, @@xpos:dword, @@ypos:dword
-	USES eax, ebx, ecx, edx, ecx, edi
+PROC drawSprite
+	ARG @@fillColor:byte, @@xpos:dword, @@ypos:dword, @@sprite:dword, @@spriteLength:dword, @@spriteWidth:dword
+	USES eax, ebx, ecx, edx, edi
 	
 	xor ecx, ecx ; counter
 	xor ebx, ebx ; line counter
 	xor edx, edx ; element counter
 	@@startLoop:
-		cmp edx, [turretArrayLength]
+		cmp edx, [@@spriteLength]
 		je @@endLoop
-		cmp ecx, 8
+		cmp ecx, [@@spriteWidth]
 		jne @@noNewLine
 			inc ebx
-			sub ecx, 8
+			sub ecx, [@@spriteWidth]
 		@@noNewLine:
-		cmp [turretSprite+edx], 1
+		mov eax, [@@sprite]
+		;add eax, edx
+		cmp [byte ptr eax + edx], 1
 		jne @@noColour
 
 			mov edi, 0A0000H
@@ -158,9 +134,8 @@ PROC drawShip
 		jmp @@startLoop
 	@@endLoop:
 
-
 	ret
-ENDP drawShip
+ENDP drawSprite
 
 PROC DisplayScore
 	USES eax, ebx, ecx, edx
@@ -195,41 +170,6 @@ ENDP DisplayScore
 
 
 
-; PROC drawTurret
-; 	ARG @@xpos:dword, @@ypos:dword
-; 	USES eax, edx, ecx, edi
-	
-
-; 		ARG @@arrlen:dword
-; 	USES eax, ebx, ecx, edx
-	
-; 	mov ebx, 12 ; width of turret
-	
-; 	xor edx, edx
-; 	xor eax, eax
-; 	xor ecx, ecx
-
-; 	mov edx, [offset turretArrayLength] ; length array
-; 	startrow: 
-; 		mov ecx, ebx ; collumn count
-; 		startcollumn:
-; 			mov edi, 0A0000H
-; 			add edi, 320*
-; 			mov al , [turret + 4*edx]
-
-			
-; 			dec ecx
-; 			dec edx
-
-; 			cmp ecx, 0
-; 			jg startcollumn
-; 			cmp edx , 0
-; 			jg startrow
-; 		loop startLoop
-
-; 	ret
-; ENDP drawTurret
-
 ;=============================================================================
 ; Uninitialized DATA
 ;=============================================================================
@@ -241,6 +181,12 @@ UDATASEG
 DATASEG
 	turretArrayLength dd 40
 	turretSprite db 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0,	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
-	testString db "test $"
+	turrentSpriteWidth dd 8
 
+	testString db "test $"
+	
+
+	enemySpriteLength dd 88
+	enemySprite db 	0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0,
+	enemySpriteWidth dd 11
 END 
