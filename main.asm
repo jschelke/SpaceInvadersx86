@@ -98,6 +98,7 @@ PROC main
 			mov [nextTickTime], eax
 			call updatePlayerPosition
 			call updateMissilePosition
+			call checkHits
 		@@skip:
 		
 		call isKeypressed

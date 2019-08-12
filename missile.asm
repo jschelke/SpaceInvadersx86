@@ -12,6 +12,8 @@ include "debug.inc"
 include "missile.inc"
 include "player.inc"
 include "graphics.inc"
+include "enemy.inc"
+
 
 ;=============================================================================
 ; CODE
@@ -74,6 +76,28 @@ PROC addMissile
     @@endLoop:
 
     ret
+ENDP
+
+PROC checkHits
+    USES eax, ebx, ecx, edx
+
+    mov ecx, [missileAmount]
+    xor ebx, ebx
+    @@missileLoop:
+        mov eax, ebx ; calculate offset of array in eax
+        mov edx, 8
+        mul edx
+
+         ; registers free: ebx, edx
+        cmp [missilePosition+eax], 1000 ;check if missile is existing
+        je @@noMissile
+             ; loop over enemies
+            call checkEnemyHit, [missilePosition+eax], [missilePosition+eax+4], ebx
+        @@noMissile:
+        inc ebx
+        loop @@missileLoop
+
+	ret
 ENDP
 
 ;=============================================================================

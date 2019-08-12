@@ -8,9 +8,11 @@ ASSUME cs:_TEXT,ds:FLAT,es:FLAT,fs:FLAT,gs:FLAT
 ;=============================================================================
 include "globals.inc"
 include "main.inc"
+include "graphics.inc"
 include "debug.inc"
 include "enemy.inc"
-include "graphics.inc"
+include "missile.inc"
+
 
 ;=============================================================================
 ; CODE
@@ -57,8 +59,7 @@ PROC addEnemies
     xor edx, edx ; current enemy position
     
     @@loopBegin:
-        mov eax, [enemyAmount]
-        cmp edx, eax
+        cmp edx, [enemyAmount]
         je @@loopEnd
         cmp ebx, [enemyCollumnAmount] ; check if new row needs to be started
         jne @@noNewRow
@@ -66,6 +67,11 @@ PROC addEnemies
             inc ecx
         @@noNewRow:
         ; calculate X position of enemy
+        push edx
+        mov eax, 4
+        mul edx
+        mov edx, eax
+
         mov eax, ebx
         push edx
         mul [enemySpacingX]
@@ -81,8 +87,56 @@ PROC addEnemies
         mov [enemyPositionY+edx], eax
         ; draw enemy
         call drawEnemy, 10, [enemyPositionX+edx], [enemyPositionY+edx]
-
+        
+        pop edx
         inc edx
+        inc ebx
+        jmp @@loopBegin
+    @@loopEnd:
+    
+    ret
+ENDP
+
+PROC checkEnemyHit
+    ARG @@xpos:dword, @@ypos:dword, @@missileNumber:dword
+    USES eax, ebx, ecx, edx
+
+    xor ebx, ebx ; current enemy position
+    @@loopBegin:
+        cmp ebx, [enemyAmount]
+        je @@loopEnd
+
+        mov eax, 4
+        mul ebx
+        mov edx, [enemyPositionX+eax]
+        cmp [@@xpos], edx
+        jl @@noHit
+            add edx, [enemyWidth]
+            cmp [@@xpos], edx
+            jg @@noHit
+                ; hit is found in X
+                mov edx, [enemyPositionY+eax]
+                cmp [@@ypos], edx
+                jg @@noHit
+                    sub edx, [enemyHeight]
+                    cmp [@@ypos], edx
+                    jl @@noHit
+                        ; hit is found in Y
+                        ; remove enemy from game
+                        call drawEnemy, 0, [enemyPositionX+eax], [enemyPositionY+eax]
+                        mov [enemyPositionX+eax], 1000
+                        mov [enemyPositionY+eax], 1000
+                        
+                        ;remove missile from game
+                        mov eax, 8
+                        mul [@@missileNumber]
+                        call drawMissile, 0, [missilePosition+eax], [missilePosition+eax+4]
+                        mov [missilePosition+eax], 1000
+                        mov [missilePosition+eax+4], 1000
+
+                        jmp @@loopEnd
+        @@noHit:
+
         inc ebx
         jmp @@loopBegin
     @@loopEnd:
@@ -100,9 +154,9 @@ UDATASEG
 ;=============================================================================
 DATASEG
     enemyAmount dd 55
-	enemyPositionX dd 1000, 1000, 1000, 1000, 10000, 1000, 1000, 1000, 1000, 10000, 1000, 1000, 1000, 1000, 10000, 1000, 1000, 1000, 1000, 10000, 1000, 1000, 1000, 1000, 10000, 1000, 1000, 1000, 1000, 10000, 1000, 1000, 1000, 1000, 10000, 1000, 1000, 1000, 1000, 10000, 1000, 1000, 1000, 1000, 10000 ;x, y
-	enemyPositionY dd 1000, 1000, 1000, 1000, 10000, 1000, 1000, 1000, 1000, 10000, 1000, 1000, 1000, 1000, 10000, 1000, 1000, 1000, 1000, 10000, 1000, 1000, 1000, 1000, 10000, 1000, 1000, 1000, 1000, 10000, 1000, 1000, 1000, 1000, 10000, 1000, 1000, 1000, 1000, 10000, 1000, 1000, 1000, 1000, 10000 ;x, y
-	
+	enemyPositionX dd 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000 ;x, y
+	enemyPositionY dd 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000
+    
     enemyCollumnAmount dd 11 ; amount of enemies next to each other
     enemySpacingX dd 20 ; X spacing between every enemy
     enemySpacingY dd 20 ; Y spacing between every enemy
