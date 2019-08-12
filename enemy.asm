@@ -22,30 +22,86 @@ CODESEG
 PROC updateEnemyPosition
     USES eax, ebx, ecx, edx
 
-    ; mov ecx, [missileAmount]
-    ; xor ebx, ebx
-    ; @@missileLoop:
-    ;     mov eax, ebx ; calculate offset of array in eax
-    ;     mov edx, 8
-    ;     mul edx
+    cmp [enemyMovementDirection], 1 ; check moevemeny direction
+    je @@moveLeft
+        ; move right
+        mov ecx, [enemySpeed]
+        add [enemyMovedX], ecx
+        mov ecx, [enemyMovedX]
+        cmp ecx, [enemyMovementRangeX] ;check if at end of movement
+        jl @@notEndLeftMovement
+            ; if at the end of the movement
+            cmp [enemyDownMoveDone], 1
+            je @@notEndLeftMovement
+                mov ebx, 2
+                mov [enemyDownMoveDone], 1
+                mov [enemyMovementDirection], 1
+                jmp @@stateFound
+        @@notEndLeftMovement:
+        mov [enemyDownMoveDone], 0
+        mov ebx, 0
+        jmp @@stateFound
+    @@moveLeft:
+    ; move left
+    mov ecx, [enemySpeed]
+    sub [enemyMovedX], ecx
+    cmp [enemyMovedX], 0 ;check if at end of movement
+    jg @@notEndRightMovement
+        ; if at the end of the movement
+        cmp [enemyDownMoveDone], 1
+        je @@notEndRightMovement
+            mov ebx, 2
+            mov [enemyDownMoveDone], 1
+            mov [enemyMovementDirection], 0
+            jmp @@stateFound
+    @@notEndRightMovement:
+    mov [enemyDownMoveDone], 0
+    mov ebx, 1
+    jmp @@stateFound
 
-    ;     cmp [missilePosition+eax], 1000 ;check if missile is existing
-    ;     je @@noMissile
-    ;         call drawMissile, 0, [missilePosition+eax], [missilePosition+eax+4] ; color over existing missile
-    ;         mov edx, [missileSpeed]
-    ;         sub [missilePosition+eax+4], edx ; move in y direction
-    ;         ;out of bounds check
-    ;         add edx, 1
-    ;         cmp [missilePosition+eax+4], edx
-    ;         jg @@noOutOfBounds
-    ;             mov [missilePosition+eax],1000
-    ;             mov [missilePosition+eax],1000
-    ;             jmp @@noMissile
-    ;         @@noOutOfBounds:
-    ;         call drawMissile, 10, [missilePosition+eax], [missilePosition+eax+4]
-    ;     @@noMissile:
-    ;     inc ebx
-    ;     loop @@missileLoop
+    @@stateFound:
+
+    xor ecx, ecx ; current enemy position
+    @@loopBegin:
+        cmp ecx, [enemyAmount]
+        je @@loopEnd
+        
+        cmp [enemyPositionX], 1000
+        je @@noEnemy
+            mov eax, 4
+            mul ecx
+
+            call drawEnemy, 0, [enemyPositionX+eax], [enemyPositionY+eax]
+
+             ; start switch case for movement direction
+            cmp ebx, 0 ; move right
+            jne @@noRightMovement
+                mov edx, [enemySpeed]
+                add [enemyPositionX+eax], edx
+                jmp @@endSwitchCase
+            @@noRightMovement:
+
+            cmp ebx, 1 ; move right
+            jne @@noLeftMovement
+                mov edx, [enemySpeed]
+                sub [enemyPositionX+eax], edx
+                jmp @@endSwitchCase
+            @@noLeftMovement:
+
+            cmp ebx, 2 ; move right
+            jne @@noDownMovement
+                mov edx, [enemySpacingY]
+                add [enemyPositionY+eax], edx
+                jmp @@endSwitchCase
+            @@noDownMovement:
+
+            @@endSwitchCase:
+            call drawEnemy, 10, [enemyPositionX+eax], [enemyPositionY+eax]
+        @@noEnemy:
+
+        inc ecx
+        jmp @@loopBegin
+    @@loopEnd:
 
 	ret
 ENDP
@@ -97,6 +153,7 @@ PROC addEnemies
     ret
 ENDP
 
+
 PROC checkEnemyHit
     ARG @@xpos:dword, @@ypos:dword, @@missileNumber:dword
     USES eax, ebx, ecx, edx
@@ -126,13 +183,16 @@ PROC checkEnemyHit
                         call drawEnemy, 0, [enemyPositionX+eax], [enemyPositionY+eax]
                         mov [enemyPositionX+eax], 1000
                         mov [enemyPositionY+eax], 1000
-                        
+
                         ;remove missile from game
                         mov eax, 8
                         mul [@@missileNumber]
                         call drawMissile, 0, [missilePosition+eax], [missilePosition+eax+4]
                         mov [missilePosition+eax], 1000
                         mov [missilePosition+eax+4], 1000
+
+                        inc [score]
+                        call DisplayScore
 
                         jmp @@loopEnd
         @@noHit:
@@ -141,6 +201,22 @@ PROC checkEnemyHit
         jmp @@loopBegin
     @@loopEnd:
     
+    ret
+ENDP
+
+PROC enemyInitialization
+    USES eax, ebx, edx
+
+    ;calculate X movement Range
+    mov eax, [enemySpacingX]
+    mov ebx, [enemyCollumnAmount]
+    mul ebx
+    add eax, [enemyOffsetX]
+    add eax, [enemyOffsetX]
+    mov ebx, SCRWIDTH
+    sub ebx, eax
+    mov [enemyMovementRangeX], ebx
+
     ret
 ENDP
 
@@ -153,19 +229,25 @@ UDATASEG
 ; DATA
 ;=============================================================================
 DATASEG
-    enemyAmount dd 55
+    enemyAmount dd 44
 	enemyPositionX dd 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000 ;x, y
 	enemyPositionY dd 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000
     
     enemyCollumnAmount dd 11 ; amount of enemies next to each other
     enemySpacingX dd 20 ; X spacing between every enemy
-    enemySpacingY dd 20 ; Y spacing between every enemy
+    enemySpacingY dd 16 ; Y spacing between every enemy
 
-    enemyOffsetX dd 10 ; X offset drom frame side
-    enemyOffsetY dd 10 ; Y offset drom frame side
+    enemyOffsetX dd 10 ; X offset from frame side
+    enemyOffsetY dd 10 ; Y offset from frame side
 
 	enemyWidth dd 10
-	enemyHeight dd 10 ; Moet gedeeld worden door 1.2 tov de hoogte om een mooi vierkant te krijgen, dit komt doordat het 320x200 grid gestretched wordt naar 640x480 pixeles
+	enemyHeight dd 8 ; Moet gedeeld worden door 1.2 tov de hoogte om een mooi vierkant te krijgen, dit komt doordat het 320x200 grid gestretched wordt naar 640x480 pixeles
+
+    enemyMovementRangeX dd 0
+    enemyMovedX dd 0
+    enemyMovementDirection db 0
+    enemyDownMoveDone db 0;
+    enemySpeed dd 1
 
     testString db "test", 10, 13, '$'
 END 

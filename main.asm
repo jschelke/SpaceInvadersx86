@@ -89,16 +89,20 @@ PROC main
 	call __keyb_installKeyboardHandler
 
 	call startUp
+	call enemyInitialization
 	call addEnemies
+	
 	@@mainloop:
 		call getTime
 		cmp [nextTickTime], eax
 		jg @@skip
 			add eax, [timePerTick]
 			mov [nextTickTime], eax
+			call updateEnemyPosition
 			call updatePlayerPosition
 			call updateMissilePosition
 			call checkHits
+			call DisplayScore
 		@@skip:
 		
 		call isKeypressed
@@ -115,6 +119,7 @@ UDATASEG
 ;=============================================================================
 DATASEG
 	timePerTick dd 5 ; 1/100th seconds
+	score dd 0
 ;=============================================================================
 ; STACK
 ;=============================================================================

@@ -62,13 +62,17 @@ PROC addMissile
         mul edx
 
         cmp [missilePosition+eax], 1000 ;check if missile is already taken
-        jne @@noAvailableMissile ; if missile available exit loop
+        jne @@noAvailableMissile ; if no missile available exit loop
             mov edx, [playerPosition] ; set x postion of missile
+            add edx, 3
             mov [missilePosition+eax], edx
 
-            mov [missilePosition+eax+4], PLAYERPOSY ; set y position of missile
+            mov edx, PLAYERPOSY
+            sub edx, [missileHeight]
+            sub edx, 1
+            mov [missilePosition+eax+4], edx ; set y position of missile
 
-            call drawMissile, 10, [playerPosition], PLAYERPOSY ; draw missile
+            ;call drawMissile, 10, [playerPosition], edx ; draw missile
             jmp @@endLoop
         @@noAvailableMissile:
         inc ebx

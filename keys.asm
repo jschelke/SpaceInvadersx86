@@ -47,15 +47,15 @@ PROC isKeypressed
 	mov [playerSpeed + 4], 0 ; reset y speed incase no key is pressed
 	cmp [__keyb_keyboardState + 48h], 1 ; Up arrow
 	jne @@notPressedUP
-		mov eax, [playerMaxSpeed + 4]
-		mov [playerSpeed + 4], eax
+		; mov eax, [playerMaxSpeed + 4]
+		; mov [playerSpeed + 4], eax
 		; call printString, offset up
 	@@notPressedUP:
 
 	cmp [__keyb_keyboardState + 50h], 1 ; Down arrow
 	jne @@notPressedDown
-		mov eax, [playerMaxSpeed]
-		mov [playerSpeed + 4], eax
+		; mov eax, [playerMaxSpeed]
+		; mov [playerSpeed + 4], eax
 		; call printString, offset down
 	@@notPressedDown:
 

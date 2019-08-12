@@ -24,7 +24,8 @@ PROC updatePlayerPosition
 	or eax, [playerSpeed + 4]
 	test eax, eax
 	jz @@nomovement
-		call drawShip, 0, [playerPosition], [playerPosition + 4] ; make old position black
+		call drawRectangle, 0, [playerPosition], [playerPosition + 4], [characterWidth], [characterHeight]
+		; call drawShip, 0, [playerPosition], [playerPosition + 4] ; make old position black
 
 		; Move to the left
 		mov eax, [playerSpeed]
@@ -72,10 +73,10 @@ UDATASEG
 ; DATA
 ;=============================================================================
 DATASEG
-	playerPosition dd 100, 100 ;x, y
+	playerPosition dd 100, PLAYERPOSY ;x, y
 	playerSpeed dd 0, 0 ;vx, vy
 	playerMaxSpeed dd 4, -4
-	characterWidth dd 30
-	characterHeight dd 25 ; Moet gedeeld worden door 1.2 tov de hoogte om een mooi vierkant te krijgen, dit komt doordat het 320x200 grid gestretched wordt naar 640x480 pixeles
+	characterWidth dd 9
+	characterHeight dd 5 ; Moet gedeeld worden door 1.2 tov de hoogte om een mooi vierkant te krijgen, dit komt doordat het 320x200 grid gestretched wordt naar 640x480 pixeles
 
 END 

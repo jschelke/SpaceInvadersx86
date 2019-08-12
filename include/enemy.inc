@@ -1,6 +1,7 @@
 GLOBAL  updateEnemyPosition:PROC, \
         addEnemies:PROC, \
-        checkEnemyHit:PROC
+        checkEnemyHit:PROC, \
+        enemyInitialization:PROC
 
 GLOBAL enemyAmount:DWORD
 GLOBAL enemyPositionX:DWORD
