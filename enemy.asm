@@ -111,14 +111,11 @@ PROC updateEnemyPosition
         inc ecx
         jmp @@loopBegin
     @@loopEnd:
-    ; cmp [enemiesAlive], 0
-    ; jne @@gameStillRunning
-    ;     ;if running this all enemies are dead
-    ;     call fillBackground, 0
-    ;     call DisplayScore
-    ;     call enemyInitialization
-	;     call addEnemies
-    ; @@gameStillRunning:
+    cmp [enemiesAlive], 0
+    jne @@gameStillRunning
+        ;if running this all enemies are dead
+        call startUp
+    @@gameStillRunning:
 
     jmp @@skipGameOver
     @@gameOver:
@@ -230,7 +227,16 @@ PROC enemyInitialization
 
     ;calculate X movement Range
     mov eax, [enemySpacingX]
-    mov ebx, [enemyCollumnAmount]
+
+    mov ebx, [enemyAmount]
+    cmp [enemyCollumnAmount], ebx ; check which is bigger
+    jge @@enemyAmountSmaller
+        mov ebx, [enemyCollumnAmount]
+        jmp @@skipStatement
+    @@enemyAmountSmaller:
+        mov ebx, [enemyAmount]
+    @@skipStatement:
+
     mul ebx
     add eax, [enemyOffsetX]
     add eax, [enemyOffsetX]
@@ -255,7 +261,7 @@ UDATASEG
 ;=============================================================================
 DATASEG
     enemiesAlive dd 0
-    enemyAmount dd 44
+    enemyAmount dd 1
 	enemyPositionX dd 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000 ;x, y
 	enemyPositionY dd 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000
     
