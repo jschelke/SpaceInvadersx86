@@ -92,9 +92,12 @@ PROC updateEnemyPosition
             jne @@noDownMovement
                 mov edx, [enemySpacingY]
                 add [enemyPositionY+eax], edx
+                
+                cmp [enemyPositionY+eax], 1000
+                jge @@endSwitchCase
 
-                mov edx, [enemyPositionY+eax]
-                cmp edx, GAMEOVERLINE
+                mov edx, GAMEOVERLINE
+                cmp [enemyPositionY+eax], edx
                 jge @@gameOver
 
                 jmp @@endSwitchCase
@@ -119,7 +122,7 @@ PROC updateEnemyPosition
 
     jmp @@skipGameOver
     @@gameOver:
-        ;call gameOver
+        call gameOver
     @@skipGameOver:
 
 	ret
